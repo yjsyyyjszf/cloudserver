@@ -66,6 +66,7 @@ function convertMD5(contentMD5) {
 function azureGetCheck(objectKey, azureMD5, azureMetadata, cb) {
     azureClient.getBlobProperties(azureContainerName, objectKey,
     (err, res) => {
+        console.log('res!!!!', res);
         assert.strictEqual(err, null, 'Expected success, got error ' +
         `on call to Azure: ${err}`);
         const resMD5 = convertMD5(res.contentSettings.contentMD5);
@@ -141,6 +142,31 @@ describeSkipIfNotMultiple('MultipleBackend put object to AZURE', () => {
                             () => done());
                         }, azureTimeout);
                     });
+                });
+            });
+
+            it.only('should put object with tagging', done => {
+                const tagging = 'key1=value1&key2=value2';
+                const params = {
+                    Bucket: azureContainerName,
+                    Key: keyName,
+                    Metadata: { 'scal-location-constraint': azureLocation },
+                    Tagging: tagging,
+                    Body: normalBody,
+                };
+                s3.putObject(params, err => {
+                    assert.equal(err, null, 'Expected success, ' +
+                    `got error ${err}`);
+                    /* eslint-disable camelcase */
+                    const metadata = {
+                        x_amz_meta_scal_location_constraint: azureLocation,
+                        tagging,
+                    };
+                    /* eslint-enable camelcase */
+                    setTimeout(() => {
+                        azureGetCheck(keyName, normalMD5, metadata,
+                        () => done());
+                    }, azureTimeout);
                 });
             });
 
