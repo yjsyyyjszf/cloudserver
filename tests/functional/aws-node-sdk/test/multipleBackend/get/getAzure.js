@@ -3,17 +3,17 @@ const assert = require('assert');
 const BucketUtility = require('../../../lib/utility/bucket-util');
 const withV4 = require('../../support/withV4');
 
-const { getAzureClient, getAzureContainerName, getKeysForTestingAzure } =
-  require('../utils');
+const { uniqName, getAzureClient, getAzureContainerName,
+  getKeysForTestingAzure } = require('../utils');
 
 const azureLocation = 'azuretest';
 const azureClient = getAzureClient();
 const azureContainerName = getAzureContainerName();
 const keys = getKeysForTestingAzure();
+const keyObject = 'getazure';
 
 const { config } = require('../../../../../../lib/Config');
 
-const azureObject = `azureobject-${Date.now()}`;
 const normalBody = Buffer.from('I am a body', 'utf8');
 
 const describeSkipIfNotMultiple = (config.backends.data !== 'multiple'
@@ -25,6 +25,7 @@ function testSuite() {
     withV4(sigCfg => {
         let bucketUtil;
         let s3;
+
         before(() => {
             process.stdout.write('Creating bucket');
             bucketUtil = new BucketUtility('default', sigCfg);
@@ -76,6 +77,7 @@ function testSuite() {
         });
 
         describe('with range', () => {
+            const azureObject = uniqName(keyObject);
             before(done => {
                 s3.putObject({
                     Bucket: azureContainerName,
@@ -120,6 +122,7 @@ function testSuite() {
         });
 
         describe('returning error', () => {
+            const azureObject = uniqName(keyObject);
             before(done => {
                 s3.putObject({
                     Bucket: azureContainerName,

@@ -7,6 +7,10 @@ const azureLocation = 'azuretest';
 
 const utils = {};
 
+utils.uniqName = name => {
+    return `${name}${new Date().getTime()}`;
+};
+
 utils.getAzureClient = () => {
     let isTestingAzure;
     let azureBlobEndpoint;

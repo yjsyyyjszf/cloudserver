@@ -3,8 +3,8 @@ const async = require('async');
 
 const withV4 = require('../../support/withV4');
 const BucketUtility = require('../../../lib/utility/bucket-util');
-const { getAzureClient, getAzureContainerName, getKeysForTestingAzure } =
-  require('../utils');
+const { uniqName, getAzureClient, getAzureContainerName,
+  getKeysForTestingAzure } = require('../utils');
 const { config } = require('../../../../../../lib/Config');
 
 const azureLocation = 'azuretest';
@@ -33,10 +33,6 @@ let s3;
 // from base64 to hex
 function convertMD5(contentMD5) {
     return Buffer.from(contentMD5, 'base64').toString('hex');
-}
-
-function uniqName(name) {
-    return `${name}${new Date().getTime()}`;
 }
 
 function azureGetCheck(objectKey, azureMD5, azureMetadata, cb) {
