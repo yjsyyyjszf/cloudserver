@@ -1,21 +1,24 @@
 FROM node:6-slim
 MAINTAINER Giorgio Regni <gr@scality.com>
 
-WORKDIR /usr/src/app
-
+ENV LANG C.UTF-8
+ARG BUILDBOT_VERSION
 # Keep the .git directory in order to properly report version
-COPY ./package.json .
-
+WORKDIR /usr/src/app
 RUN apt-get update \
-    && apt-get install -y jq python git build-essential --no-install-recommends \
-    && npm install --production \
-    && apt-get autoremove --purge -y python git build-essential \
-    && rm -rf /var/lib/apt/lists/* \
+    && apt-get install -y jq python git build-essential --no-install-recommends
+
+COPY ./package.json ./
+
+RUN npm install --production \
     && npm cache clear \
     && rm -rf ~/.node-gyp \
     && rm -rf /tmp/npm-*
+# For CI builds
+COPY ./eve/workers/build ./eve/workers/build
+RUN bash -l ./eve/workers/build/build.sh
 
-COPY ./ ./
+COPY . ./
 
 VOLUME ["/usr/src/app/localData","/usr/src/app/localMetadata"]
 
