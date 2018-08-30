@@ -212,11 +212,23 @@
             "supportsVersioning": false
         }
     },
+<<<<<<< HEAD
     "transientfile": {
         "type": "file",
         "objectId": "transientfile",
         "legacyAwsBehavior": false,
         "details": {},
         "isTransient": true
+=======
+	"b2backend": {
+        "type": "b2",
+        "legacyAwsBehavior": false,
+        "details": {
+            "b2StorageEndpoint": "api.backblazeb2.com",
+            "b2AccountId": "fakeccountid",
+            "b2ApplicationKey": "Fake00key123",
+            "b2BucketName":"zenkotester"
+        }
+>>>>>>> 766c206fce5541beacb3794f0d44de2a49116182
     }
 }
