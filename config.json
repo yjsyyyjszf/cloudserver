@@ -112,5 +112,9 @@
                 "maxSockets": null
             }
         }
+    },
+    "azureIndexer": {
+        "location": "trial",
+        "extensions": ["mp4"]
     }
 }
