@@ -9,65 +9,10 @@ branches:
 
 models:
   - env: &global-env
-      azurebackend_AZURE_STORAGE_ACCESS_KEY: >-
-        %(secret:azure_storage_access_key)s
-      azurebackend_AZURE_STORAGE_ACCOUNT_NAME: >-
-        %(secret:azure_storage_account_name)s
-      azurebackend_AZURE_STORAGE_ENDPOINT: >-
-        %(secret:azure_storage_endpoint)s
-      azurebackend2_AZURE_STORAGE_ACCESS_KEY: >-
-        %(secret:azure_storage_access_key_2)s
-      azurebackend2_AZURE_STORAGE_ACCOUNT_NAME: >-
-        %(secret:azure_storage_account_name_2)s
-      azurebackend2_AZURE_STORAGE_ENDPOINT: >-
-        %(secret:azure_storage_endpoint_2)s
-      azurebackendmismatch_AZURE_STORAGE_ACCESS_KEY: >-
-        %(secret:azure_storage_access_key)s
-      azurebackendmismatch_AZURE_STORAGE_ACCOUNT_NAME: >-
-        %(secret:azure_storage_account_name)s
-      azurebackendmismatch_AZURE_STORAGE_ENDPOINT: >-
-        %(secret:azure_storage_endpoint)s
-      azurenonexistcontainer_AZURE_STORAGE_ACCESS_KEY: >-
-        %(secret:azure_storage_access_key)s
-      azurenonexistcontainer_AZURE_STORAGE_ACCOUNT_NAME: >-
-        %(secret:azure_storage_account_name)s
-      azurenonexistcontainer_AZURE_STORAGE_ENDPOINT: >-
-        %(secret:azure_storage_endpoint)s
-      azuretest_AZURE_BLOB_ENDPOINT: "%(secret:azure_storage_endpoint)s"
-      b2backend_B2_ACCOUNT_ID: "%(secret:b2backend_b2_account_id)s"
-      b2backend_B2_STORAGE_ACCESS_KEY: >-
-        %(secret:b2backend_b2_storage_access_key)s
-      GOOGLE_SERVICE_EMAIL: "%(secret:gcp_service_email)s"
-      GOOGLE_SERVICE_KEY: "%(secret:gcp_service_key)s"
-      AWS_S3_BACKEND_ACCESS_KEY: "%(secret:aws_s3_backend_access_key)s"
-      AWS_S3_BACKEND_SECRET_KEY: "%(secret:aws_s3_backend_secret_key)s"
-      AWS_S3_BACKEND_ACCESS_KEY_2: "%(secret:aws_s3_backend_access_key_2)s"
-      AWS_S3_BACKEND_SECRET_KEY_2: "%(secret:aws_s3_backend_secret_key_2)s"
-      AWS_GCP_BACKEND_ACCESS_KEY: "%(secret:aws_gcp_backend_access_key)s"
-      AWS_GCP_BACKEND_SECRET_KEY: "%(secret:aws_gcp_backend_secret_key)s"
-      AWS_GCP_BACKEND_ACCESS_KEY_2: "%(secret:aws_gcp_backend_access_key_2)s"
-      AWS_GCP_BACKEND_SECRET_KEY_2: "%(secret:aws_gcp_backend_secret_key_2)s"
-      b2backend_B2_STORAGE_ENDPOINT: "%(secret:b2backend_b2_storage_endpoint)s"
-      gcpbackend2_GCP_SERVICE_EMAIL: "%(secret:gcp2_service_email)s"
-      gcpbackend2_GCP_SERVICE_KEY: "%(secret:gcp2_service_key)s"
-      gcpbackend2_GCP_SERVICE_KEYFILE: /root/.gcp/servicekey
-      gcpbackend_GCP_SERVICE_EMAIL: "%(secret:gcp_service_email)s"
-      gcpbackend_GCP_SERVICE_KEY: "%(secret:gcp_service_key)s"
-      gcpbackendmismatch_GCP_SERVICE_EMAIL: >-
-        %(secret:gcpbackendmismatch_gcp_service_email)s
-      gcpbackendmismatch_GCP_SERVICE_KEY: >-
-        %(secret:gcpbackendmismatch_gcp_service_key)s
-      gcpbackend_GCP_SERVICE_KEYFILE: /root/.gcp/servicekey
-      gcpbackendmismatch_GCP_SERVICE_KEYFILE: /root/.gcp/servicekey
-      gcpbackendnoproxy_GCP_SERVICE_KEYFILE: /root/.gcp/servicekey
-      gcpbackendproxy_GCP_SERVICE_KEYFILE: /root/.gcp/servicekey
   - env: &mongo-vars
       S3BACKEND: "mem"
       MPU_TESTING: "yes"
       S3METADATA: mongodb
-  - env: &multiple-backend-vars
-      S3BACKEND: "mem"
-      S3DATA: "multiple"
   - env: &file-mem-mpu
       S3BACKEND: "file"
       S3VAULT: "mem"
@@ -112,7 +57,6 @@ stages:
           stage_names:
             - linting-coverage
             - file-ft-tests
-            - multiple-backend-test
             - mongo-ft-tests
           waitForFinish: True
           haltOnFailure: True
@@ -151,49 +95,6 @@ stages:
       - ShellCommand:
           name: Unit Coverage logs
           command: find /tmp/unit -exec cat {} \;
-
-  multiple-backend-test:
-    worker:
-      type: kube_pod
-      path: eve/workers/pod.yaml
-      images:
-        aggressor: eve/workers/build
-        s3: "."
-      vars:
-        aggressorMemLimit: "2Gi"
-        s3MemLimit: "2Gi"
-        env:
-          <<: *multiple-backend-vars
-          <<: *global-env
-    steps:
-      - Git: *clone
-      - ShellCommand: *credentials
-      - ShellCommand: *npm-install
-      - ShellCommand:
-          command: |
-            bash -c "
-            source /root/.aws/exports &> /dev/null
-            set -ex
-            bash wait_for_local_port.bash 8000 40
-            npm run multiple_backend_test"
-          <<: *follow-s3-log
-          env:
-            <<: *multiple-backend-vars
-            <<: *global-env
-            S3_LOCATION_FILE: tests/locationConfig/locationConfigTests.json
-      - ShellCommand:
-          command: mvn test
-          workdir: build/tests/functional/jaws
-          <<: *follow-s3-log
-          env:
-            <<: *multiple-backend-vars
-      - ShellCommand:
-          command: rspec tests.rb
-          workdir: build/tests/functional/fog
-          <<: *follow-s3-log
-          env:
-            <<: *multiple-backend-vars
-      - Upload: *upload-artifacts
 
   mongo-ft-tests:
     worker: &s3-pod

@@ -5,7 +5,6 @@ const DataFileInterface = require('../../../lib/data/file/backend');
 
 const memLocation = 'scality-internal-mem';
 const fileLocation = 'scality-internal-file';
-const awsLocation = 'awsbackend';
 const clients = parseLC();
 
 describe('locationConstraintParser', () => {
@@ -17,9 +16,5 @@ describe('locationConstraintParser', () => {
     it('should return object containing file object', () => {
         assert.notEqual(Object.keys(clients).indexOf(fileLocation), -1);
         assert(clients[fileLocation] instanceof DataFileInterface);
-    });
-    it('should return object containing AWS object', () => {
-        assert.notEqual(Object.keys(clients).indexOf(awsLocation), -1);
-        assert.strictEqual(typeof clients[awsLocation], 'object');
     });
 });
