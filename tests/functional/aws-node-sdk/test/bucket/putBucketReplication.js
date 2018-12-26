@@ -168,54 +168,6 @@ describe('aws-node-sdk test putBucketReplication configuration rules', () => {
         });
 
     replicationUtils.validRoleARNs.forEach(ARN => {
-        const config = setConfigRules({
-            Destination: {
-                Bucket: `arn:aws:s3:::${destinationBucket}`,
-                StorageClass: 'us-east-2',
-            },
-        });
-        config.Role = ARN;
-
-        it('should accept configuration if \'Role\' is a single valid ' +
-            `Amazon Resource Name: '${ARN}', and a rule storageClass defines ` +
-            'an external location', done =>
-            checkError(config, null, done));
-    });
-
-    it('should allow a combination of storageClasses across rules', done => {
-        const config = setConfigRules([replicationConfig.Rules[0], {
-            Destination: {
-                Bucket: `arn:aws:s3:::${destinationBucket}`,
-                StorageClass: 'us-east-2',
-            },
-            Prefix: 'bar',
-            Status: 'Enabled',
-        }]);
-        config.Role = 'arn:aws:iam::account-id:role/resource,' +
-            'arn:aws:iam::account-id:role/resource1';
-        checkError(config, null, done);
-    });
-
-    it('should not allow a comma separated list of roles when a rule ' +
-        'storageClass defines an external location', done => {
-        const config = {
-            Role: 'arn:aws:iam::account-id:role/src-resource,' +
-                'arn:aws:iam::account-id:role/dest-resource',
-            Rules: [
-                {
-                    Destination: {
-                        Bucket: `arn:aws:s3:::${destinationBucket}`,
-                        StorageClass: 'us-east-2',
-                    },
-                    Prefix: 'test-prefix',
-                    Status: 'Enabled',
-                },
-            ],
-        };
-        checkError(config, 'InvalidArgument', done);
-    });
-
-    replicationUtils.validRoleARNs.forEach(ARN => {
         const Role = `${ARN},${ARN}`;
         const config = Object.assign({}, replicationConfig, { Role });
 
@@ -333,19 +285,6 @@ describe('aws-node-sdk test putBucketReplication configuration rules', () => {
     });
 
     replicationUtils.validStorageClasses.forEach(storageClass => {
-        const config = setConfigRules({
-            Destination: {
-                Bucket: `arn:aws:s3:::${destinationBucket}`,
-                StorageClass: storageClass,
-            },
-        });
-
-        it('should accept configuration when \'StorageClass\' is ' +
-            `${storageClass}`, done => checkError(config, null, done));
-    });
-
-    // A combination of external destination storage classes.
-    replicationUtils.validMultipleStorageClasses.forEach(storageClass => {
         const config = setConfigRules({
             Destination: {
                 Bucket: `arn:aws:s3:::${destinationBucket}`,
