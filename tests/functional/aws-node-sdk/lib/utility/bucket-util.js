@@ -13,7 +13,7 @@ class BucketUtility {
 
     createOne(bucketName) {
         return this.s3
-            .createBucket({ Bucket: bucketName }.promise())
+            .createBucket({ Bucket: bucketName }).promise()
             .then(() => bucketName);
     }
 
