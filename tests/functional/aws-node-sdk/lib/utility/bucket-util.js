@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-const { S3 } = require('aws-sdk');
+const AWS = require('aws-sdk');
 const projectFixture = require('../fixtures/project');
 const getConfig = require('../../test/support/config');
 
@@ -7,7 +7,8 @@ class BucketUtility {
     constructor(profile = 'default', config = {}) {
         const s3Config = getConfig(profile, config);
 
-        this.s3 = Promise.promisifyAll(new S3(s3Config));
+        AWS.config.setPromisesDependency(Promise);
+        this.s3 = new AWS.S3(s3Config);
     }
 
     createOne(bucketName) {
