@@ -13,7 +13,7 @@ class BucketUtility {
 
     createOne(bucketName) {
         return this.s3
-            .createBucketAsync({ Bucket: bucketName })
+            .createBucket({ Bucket: bucketName })
             .then(() => bucketName);
     }
 
@@ -41,7 +41,7 @@ class BucketUtility {
 
     deleteOne(bucketName) {
         return this.s3
-            .deleteBucketAsync({ Bucket: bucketName });
+            .deleteBucket({ Bucket: bucketName });
     }
 
     deleteMany(bucketNames) {
@@ -71,7 +71,7 @@ class BucketUtility {
                         .filter(object => !object.Key.endsWith('/'))
                         // remove all objects
                         .map(object =>
-                            this.s3.deleteObjectAsync({
+                            this.s3.deleteObject({
                                 Bucket: bucketName,
                                 Key: object.Key,
                                 VersionId: object.VersionId,
@@ -82,7 +82,7 @@ class BucketUtility {
                             .filter(object => object.Key.endsWith('/'))
                             // remove all directories
                             .map(object =>
-                                this.s3.deleteObjectAsync({
+                                this.s3.deleteObject({
                                     Bucket: bucketName,
                                     Key: object.Key,
                                     VersionId: object.VersionId,
@@ -92,7 +92,7 @@ class BucketUtility {
                         )
                         .concat(data.DeleteMarkers
                             .map(object =>
-                                 this.s3.deleteObjectAsync({
+                                 this.s3.deleteObject({
                                      Bucket: bucketName,
                                      Key: object.Key,
                                      VersionId: object.VersionId,
@@ -104,7 +104,7 @@ class BucketUtility {
 
     getOwner() {
         return this.s3
-            .listBucketsAsync()
+            .listBuckets()
             .then(data => data.Owner);
     }
 }
