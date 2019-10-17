@@ -446,7 +446,7 @@ describe('GET Bucket - AWS.S3.listObjects', () => {
                 const objects = [{ Bucket, Key: k }, { Bucket, Key: 'zzz' }];
 
                 Promise
-                    .mapSeries(objects, param => s3.putObject(param).promise()
+                    .mapSeries(objects, param => s3.putObject(param).promise())
                     .then(() => s3.listObjects({ Bucket, MaxKeys: 1,
                         Delimiter: 'foo' }).promise())
                     .then(data => {
@@ -471,7 +471,7 @@ describe('GET Bucket - AWS.S3.listObjects', () => {
                 const objects = [{ Bucket, Key: k }];
 
                 Promise
-                    .mapSeries(objects, param => s3.putObject(param.promise()))
+                    .mapSeries(objects, param => s3.putObject(param).promise())
                     .then(() => s3.listObjectsV2(
                         { Bucket, StartAfter: k }).promise())
                     .then(data => {
