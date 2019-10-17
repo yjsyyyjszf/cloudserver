@@ -26,11 +26,11 @@ describe('GET bucket cors', () => {
                     MaxAgeSeconds: 3000 },
             ] };
             before(() =>
-                s3.createBucketAsync({ Bucket: bucketName })
-                .then(() => s3.putBucketCorsAsync({
+                s3.createBucket({ Bucket: bucketName }).promise()
+                .then(() => s3.putBucketCors({
                     Bucket: bucketName,
                     CORSConfiguration: sampleCors,
-                })));
+                }).promise()));
 
             it('should return cors configuration successfully', done => {
                 s3.getBucketCors({ Bucket: bucketName }, (err, data) => {
@@ -51,11 +51,11 @@ describe('GET bucket cors', () => {
                     AllowedHeaders: [testValue] },
             ] };
             before(() =>
-                s3.createBucketAsync({ Bucket: bucketName })
-                .then(() => s3.putBucketCorsAsync({
+                s3.createBucket({ Bucket: bucketName }).promise()
+                .then(() => s3.putBucketCors({
                     Bucket: bucketName,
                     CORSConfiguration: sampleCors,
-                })));
+                }).promise()));
 
             it('should be preserved when putting / getting cors resource',
             done => {
@@ -75,11 +75,11 @@ describe('GET bucket cors', () => {
                     AllowedOrigins: ['http://www.example.com'] },
             ] };
             before(() =>
-                s3.createBucketAsync({ Bucket: bucketName })
-                .then(() => s3.putBucketCorsAsync({
+                s3.createBucket({ Bucket: bucketName }).promise()
+                .then(() => s3.putBucketCors({
                     Bucket: bucketName,
                     CORSConfiguration: sampleCors,
-                })));
+                }).promise()));
 
             it('should be preserved when retrieving cors resource',
             done => {
