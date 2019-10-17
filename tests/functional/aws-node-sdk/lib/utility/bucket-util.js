@@ -13,7 +13,7 @@ class BucketUtility {
 
     createOne(bucketName) {
         return this.s3
-            .createBucket({ Bucket: bucketName })
+            .createBucket({ Bucket: bucketName }.promise())
             .then(() => bucketName);
     }
 
@@ -41,7 +41,7 @@ class BucketUtility {
 
     deleteOne(bucketName) {
         return this.s3
-            .deleteBucket({ Bucket: bucketName });
+            .deleteBucket({ Bucket: bucketName }).promise();
     }
 
     deleteMany(bucketNames) {
@@ -64,7 +64,7 @@ class BucketUtility {
         };
 
         return this.s3
-            .listObjectVersionsAsync(param)
+            .listObjectVersions(param).promise()
             .then(data =>
                 Promise.all(
                     data.Versions
@@ -75,7 +75,7 @@ class BucketUtility {
                                 Bucket: bucketName,
                                 Key: object.Key,
                                 VersionId: object.VersionId,
-                            })
+                            }).promise()
                               .then(() => object)
                         )
                         .concat(data.Versions
@@ -86,7 +86,7 @@ class BucketUtility {
                                     Bucket: bucketName,
                                     Key: object.Key,
                                     VersionId: object.VersionId,
-                                })
+                                }).promise()
                                 .then(() => object)
                             )
                         )
@@ -96,7 +96,7 @@ class BucketUtility {
                                      Bucket: bucketName,
                                      Key: object.Key,
                                      VersionId: object.VersionId,
-                                 })
+                                 }).promise()
                                  .then(() => object)))
                 )
             );
@@ -104,7 +104,7 @@ class BucketUtility {
 
     getOwner() {
         return this.s3
-            .listBuckets()
+            .listBuckets().promise()
             .then(data => data.Owner);
     }
 }
