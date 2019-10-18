@@ -179,7 +179,7 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
                     assert(res.Location, 'No Location in response');
                     assert.deepStrictEqual(res.Location, `/${name}`,
                       'Wrong Location header');
-                    bucketUtil.deleteOne(name).then(() => done()).catch(done);
+                    bucketUtil.deleteOne(name).then(done).catch(done);
                 });
             }
             it('should create bucket if name is valid', done =>
@@ -203,25 +203,28 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
                             CreateBucketConfiguration: {
                                 LocationConstraint: location,
                             },
-                        }, done).promise();
+                        }).promise().then(done).catch(done);
                 });
             });
         });
 
         describe('bucket creation with invalid location', () => {
             it('should return errors InvalidLocationConstraint', done => {
-                bucketUtil.s3.createBucket(
-                    {
-                        Bucket: bucketName,
-                        CreateBucketConfiguration: {
-                            LocationConstraint: 'coco',
-                        },
-                    }, err => {
-                    assert.strictEqual(err.code,
-                    'InvalidLocationConstraint');
+                bucketUtil.s3.createBucket({
+                    Bucket: bucketName,
+                    CreateBucketConfiguration: {
+                        LocationConstraint: 'coco',
+                    },
+                }).promise().then(() => {
+                    const e = new Error('Expect failure in creation, ' +
+                        'but it succeeded');
+
+                    return done(e);
+                }).catch(err => {
+                    assert.strictEqual(err.code, 'InvalidLocationConstraint');
                     assert.strictEqual(err.statusCode, 400);
                     done();
-                }).promise();
+                });
             });
         });
     });
