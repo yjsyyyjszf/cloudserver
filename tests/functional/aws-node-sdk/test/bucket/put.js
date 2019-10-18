@@ -174,13 +174,15 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
 
         describe('bucket creation success', () => {
             function _test(name, done) {
-                bucketUtil.s3.createBucket({ Bucket: name }, (err, res) => {
-                    assert.ifError(err);
+                bucketUtil.s3.createBucket({ Bucket: name })
+                .then(res => {
                     assert(res.Location, 'No Location in response');
                     assert.deepStrictEqual(res.Location, `/${name}`,
                       'Wrong Location header');
-                    bucketUtil.deleteOne(name).then(done).catch(done);
-                });
+                })
+                .then(bucketUtil.deleteOne(name))
+                .then(done)
+                .catch(done);
             }
             it('should create bucket if name is valid', done =>
                 _test('scality-very-valid-bucket-name', done));
